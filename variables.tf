@@ -42,3 +42,9 @@ variable "eks_node_groups" {
   type        = map(any)
   default     = {}
 }
+
+variable "eks_public_access_cidr" {
+  description = "List of CIDR blocks. Indicates which CIDR blocks can access the Amazon EKS public API server endpoint when enabled."
+  type        = list(string)
+  default     = []
+}

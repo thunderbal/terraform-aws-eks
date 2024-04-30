@@ -58,6 +58,7 @@ No modules.
 | <a name="input_eks_addons"></a> [eks\_addons](#input\_eks\_addons) | List of EKS AddOns to deploy. | `map(any)` | <pre>{<br>  "coredns": {},<br>  "kube-proxy": {},<br>  "vpc-cni": {}<br>}</pre> | no |
 | <a name="input_eks_farget_profiles"></a> [eks\_farget\_profiles](#input\_eks\_farget\_profiles) | List of Farget profiles to deploy. | `map(any)` | <pre>{<br>  "default": {<br>    "namespace": "*"<br>  }<br>}</pre> | no |
 | <a name="input_eks_node_groups"></a> [eks\_node\_groups](#input\_eks\_node\_groups) | List of AWS managed node groups to deploy. | `map(any)` | `{}` | no |
+| <a name="input_eks_public_access_cidr"></a> [eks\_public\_access\_cidr](#input\_eks\_public\_access\_cidr) | List of CIDR blocks. Indicates which CIDR blocks can access the Amazon EKS public API server endpoint when enabled. | `list(string)` | `[]` | no |
 | <a name="input_eks_version"></a> [eks\_version](#input\_eks\_version) | Desired Kubernetes master version. | `string` | `""` | no |
 | <a name="input_name"></a> [name](#input\_name) | EKS cluster name. | `string` | `"default"` | no |
 | <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | List of subnets for EKS cluster. | `list(string)` | n/a | yes |

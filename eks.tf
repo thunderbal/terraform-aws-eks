@@ -6,8 +6,9 @@ resource "aws_eks_cluster" "self" {
   version  = var.eks_version
 
   vpc_config {
-    subnet_ids = var.subnet_ids
-    # endpoint_public_access  = false
+    subnet_ids              = var.subnet_ids
+    public_access_cidrs     = local.public_access_cidr
+    endpoint_public_access  = length(local.public_access_cidr) > 0
     endpoint_private_access = true
     # security_group_ids      = [ aws_security_group.self.id ]
   }

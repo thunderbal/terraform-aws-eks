@@ -4,11 +4,12 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
-  aws_account       = data.aws_caller_identity.current.account_id
-  aws_region        = data.aws_region.current.name
-  name_prefix       = var.name
-  eks_addons        = var.eks_addons
-  eks_addons_latest = true
+  aws_account        = data.aws_caller_identity.current.account_id
+  aws_region         = data.aws_region.current.name
+  name_prefix        = var.name
+  public_access_cidr = var.eks_public_access_cidr
+  eks_addons         = var.eks_addons
+  eks_addons_latest  = true
   eks_addons_policies = {
     vpc-cni = contains(keys(local.eks_addons), "vpc-cni") ? ["AmazonEKS_CNI_Policy"] : []
   }
