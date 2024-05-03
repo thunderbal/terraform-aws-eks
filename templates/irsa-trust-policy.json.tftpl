@@ -1,0 +1,18 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Federated": "${idp_arn}"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringEquals": {
+                    "${idp_uri}:aud": "sts.amazonaws.com",
+                    "${idp_uri}:sub": "system:serviceaccount:${namespace}:${service_account}"
+                }
+            }
+        }
+    ]
+}

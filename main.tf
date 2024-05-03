@@ -9,9 +9,13 @@ locals {
   name_prefix       = var.name
   eks_addons        = var.eks_addons
   eks_addons_latest = true
-  eks_addons_policies = {
-    vpc-cni = contains(keys(local.eks_addons), "vpc-cni") ? ["AmazonEKS_CNI_Policy"] : []
+  eks_irsa_policies = {
+    vpc-cni = {
+      policies        = ["AmazonEKS_CNI_Policy"]
+      service_account = "aws-node"
+    }
   }
+
   eks_farget_profiles = var.eks_farget_profiles
   eks_node_groups = {
     for k, v in var.eks_node_groups : k => {

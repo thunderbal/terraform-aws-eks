@@ -25,15 +25,6 @@ resource "aws_eks_cluster" "self" {
   depends_on = [aws_iam_role_policy_attachment.eks_cluster]
 }
 
-resource "aws_eks_addon" "self" {
-  for_each                 = local.eks_addons
-  addon_name               = each.key
-  addon_version            = data.aws_eks_addon_version.self[each.key].version
-  cluster_name             = aws_eks_cluster.self.name
-  service_account_role_arn = try(aws_iam_role.eks_addons[each.key].arn, "")
-  depends_on               = [aws_eks_fargate_profile.self, aws_eks_node_group.self]
-}
-
 resource "aws_eks_fargate_profile" "self" {
   for_each               = local.eks_farget_profiles
   fargate_profile_name   = each.key
@@ -65,4 +56,13 @@ resource "aws_eks_node_group" "self" {
   lifecycle {
     ignore_changes = [scaling_config[0].desired_size]
   }
+}
+
+resource "aws_eks_addon" "self" {
+  for_each                 = local.eks_addons
+  addon_name               = each.key
+  addon_version            = data.aws_eks_addon_version.self[each.key].version
+  cluster_name             = aws_eks_cluster.self.name
+  service_account_role_arn = try(aws_iam_role.eks_addons[each.key].arn, "")
+  depends_on               = [aws_eks_fargate_profile.self, aws_eks_node_group.self]
 }

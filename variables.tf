@@ -24,6 +24,9 @@ variable "eks_addons" {
     vpc-cni    = {}
     coredns    = {}
     kube-proxy = {}
+    # aws-ebs-csi-driver = {}
+    # aws-efs-csi-driver = {}
+    # eks-pod-identity-agent = {}
   }
 }
 

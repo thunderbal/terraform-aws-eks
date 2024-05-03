@@ -112,43 +112,24 @@ resource "aws_iam_role_policy_attachment" "eks_node" {
 
 # -----------------------------------------------------------------------------
 # - Role for VPC CNI plugin ()
-data "aws_iam_policy_document" "eks_addons_assume" {
-  for_each = local.eks_addons_policies
-
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-
-    principals {
-      type        = "Federated"
-      identifiers = [aws_iam_openid_connect_provider.self.arn]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = join(":", [aws_iam_openid_connect_provider.self.url, "aud"])
-      values   = ["sts.amazonaws.com"]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = join(":", [aws_iam_openid_connect_provider.self.url, "sub"])
-      values   = ["system:serviceaccount:kube-system:aws-node"]
-    }
-  }
-}
-
 resource "aws_iam_role" "eks_addons" {
-  for_each           = local.eks_addons_policies
-  name_prefix        = join("-", [local.name_prefix, each.key])
-  assume_role_policy = data.aws_iam_policy_document.eks_addons_assume[each.key].json
+  for_each    = { for k, v in local.eks_addons : k => local.eks_irsa_policies[k] if contains(keys(local.eks_irsa_policies), k) }
+  name_prefix = join("-", [local.name_prefix, each.key])
+  assume_role_policy = templatefile("${path.module}/templates/irsa-trust-policy.json.tftpl", {
+    idp_arn         = aws_iam_openid_connect_provider.self.arn
+    idp_uri         = aws_iam_openid_connect_provider.self.url
+    namespace       = "kube-system"
+    service_account = each.value.service_account
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "eks_addons" { # TODO
-  for_each = merge(flatten([for k, v in local.eks_addons_policies : { for p in v : join("_", [k, p]) => {
-    role   = k
-    policy = p
-  } }])...)
+  for_each = merge(flatten([
+    for k, v in local.eks_addons : { for p in try(local.eks_irsa_policies[k].policies, []) : join("_", [k, p]) => {
+      role   = k
+      policy = p
+    } }
+  ])...)
   # for_each = contains(keys(local.eks_addons), "vpc-cni") ? toset(["AmazonEKS_CNI_Policy"]) : []
   role       = aws_iam_role.eks_addons[each.value.role].name
   policy_arn = "arn:aws:iam::aws:policy/${each.value.policy}"
