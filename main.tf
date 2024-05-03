@@ -22,7 +22,6 @@ locals {
       desired_size  = try(v.desired_size, v.min_size, 0)
     }
   }
-  eks_oidc_id = regex("[^/]+$", aws_eks_cluster.self.identity[0].oidc[0].issuer)
 }
 
 data "aws_eks_addon_version" "self" {

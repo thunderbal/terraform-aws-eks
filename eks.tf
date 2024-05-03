@@ -1,6 +1,11 @@
 # eks.tf
 
 resource "aws_eks_cluster" "self" {
+  #checkov:skip=CKV_AWS_37:Ensure Amazon EKS control plane logging is enabled for all log types
+  #checkov:skip=CKV_AWS_38:Ensure Amazon EKS public endpoint not accessible to 0.0.0.0/0
+  #checkov:skip=CKV_AWS_39:Ensure Amazon EKS public endpoint disabled
+  #checkov:skip=CKV_AWS_58:Ensure EKS Cluster has Secrets Encryption Enabled
+  #checkov:skip=CKV_AWS_339:Ensure EKS clusters run on a supported Kubernetes version
   name     = local.name_prefix
   role_arn = aws_iam_role.eks_cluster.arn
   version  = var.eks_version

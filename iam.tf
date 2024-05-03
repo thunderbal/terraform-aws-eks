@@ -121,18 +121,18 @@ data "aws_iam_policy_document" "eks_addons_assume" {
 
     principals {
       type        = "Federated"
-      identifiers = ["arn:aws:iam::${local.aws_account}:oidc-provider/oidc.eks.${local.aws_region}.amazonaws.com/id/${local.eks_oidc_id}"]
+      identifiers = [aws_iam_openid_connect_provider.self.arn]
     }
 
     condition {
       test     = "StringEquals"
-      variable = "oidc.eks.${local.aws_region}.amazonaws.com/id/${local.eks_oidc_id}:aud"
+      variable = join(":", [aws_iam_openid_connect_provider.self.url, "aud"])
       values   = ["sts.amazonaws.com"]
     }
 
     condition {
       test     = "StringEquals"
-      variable = "oidc.eks.${local.aws_region}.amazonaws.com/id/${local.eks_oidc_id}:sub"
+      variable = join(":", [aws_iam_openid_connect_provider.self.url, "sub"])
       values   = ["system:serviceaccount:kube-system:aws-node"]
     }
   }
