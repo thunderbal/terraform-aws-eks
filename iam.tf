@@ -41,40 +41,18 @@ resource "aws_iam_role_policy_attachment" "eks_cluster" {
 
 # -----------------------------------------------------------------------------
 # - Role for EKS Fargate Profile
-data "aws_iam_policy_document" "eks_fargate_assume" {
-  count = length(local.eks_farget_profiles) > 0 ? 1 : 0
-
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["eks-fargate-pods.amazonaws.com"]
-    }
-
-    condition {
-      test     = "ArnLike"
-      variable = "aws:SourceArn"
-      values = [join(":", [
-        "arn:aws:eks",
-        local.aws_region,
-        local.aws_account,
-        join("/", ["fargateprofile", local.name_prefix, "*"])
-      ])]
-    }
-  }
-}
-
 resource "aws_iam_role" "eks_fargate" {
-  count              = length(local.eks_farget_profiles) > 0 ? 1 : 0
-  name_prefix        = join("-", [local.name_prefix, "fargate"])
-  assume_role_policy = data.aws_iam_policy_document.eks_fargate_assume[0].json
+  name_prefix = join("-", [local.name_prefix, "fargate"])
+  assume_role_policy = templatefile("${path.module}/templates/fargate-trust-policy.json.tftpl", {
+    aws_region  = local.aws_region
+    aws_account = local.aws_account
+    name        = local.name_prefix
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "eks_fargate" {
-  for_each   = length(local.eks_farget_profiles) < 1 ? [] : toset(["AmazonEKSFargatePodExecutionRolePolicy"])
-  role       = aws_iam_role.eks_fargate[0].name
+  for_each   = toset(["AmazonEKSFargatePodExecutionRolePolicy"])
+  role       = aws_iam_role.eks_fargate.name
   policy_arn = "arn:aws:iam::aws:policy/${each.value}"
 }
 
@@ -83,8 +61,6 @@ resource "aws_iam_role_policy_attachment" "eks_fargate" {
 # -----------------------------------------------------------------------------
 # - Role for EKS Nodes
 data "aws_iam_policy_document" "eks_node_assume" {
-  count = length(local.eks_node_groups) > 0 ? 1 : 0
-
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
@@ -97,14 +73,13 @@ data "aws_iam_policy_document" "eks_node_assume" {
 }
 
 resource "aws_iam_role" "eks_node" {
-  count              = length(local.eks_node_groups) > 0 ? 1 : 0
-  name_prefix        = join("-", [local.name_prefix, "node"])
-  assume_role_policy = data.aws_iam_policy_document.eks_node_assume[0].json
+  name               = "${local.name_prefix}-node"
+  assume_role_policy = data.aws_iam_policy_document.eks_node_assume.json
 }
 
 resource "aws_iam_role_policy_attachment" "eks_node" {
-  for_each   = length(local.eks_node_groups) < 1 ? [] : toset(["AmazonEKSWorkerNodePolicy", "AmazonEC2ContainerRegistryReadOnly"])
-  role       = aws_iam_role.eks_node[0].name
+  for_each   = toset(["AmazonEKSWorkerNodePolicy", "AmazonEC2ContainerRegistryReadOnly"])
+  role       = aws_iam_role.eks_node.name
   policy_arn = "arn:aws:iam::aws:policy/${each.value}"
 }
 

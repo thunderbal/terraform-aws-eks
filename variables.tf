@@ -21,23 +21,24 @@ variable "eks_addons" {
   description = "List of EKS AddOns to deploy."
   type        = map(any)
   default = {
-    vpc-cni    = {}
-    coredns    = {}
-    kube-proxy = {}
+    vpc-cni                = {}
+    coredns                = {}
+    kube-proxy             = {}
+    eks-pod-identity-agent = {}
     # aws-ebs-csi-driver = {}
     # aws-efs-csi-driver = {}
-    # eks-pod-identity-agent = {}
   }
 }
 
 variable "eks_farget_profiles" {
   description = "List of Farget profiles to deploy."
-  type        = map(any)
-  default = {
-    default = {
-      namespace = "*"
-    }
-  }
+  type = map(list(
+    object({
+      namespace = string
+      labels    = optional(map(string), {})
+    })
+  ))
+  default = {}
 }
 
 variable "eks_node_groups" {

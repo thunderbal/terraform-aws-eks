@@ -5,7 +5,7 @@
 - un SG est créé et autorise tout
 
 ## Requirements
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -45,7 +45,6 @@ No modules.
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_eks_addon_version.self](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/eks_addon_version) | data source |
 | [aws_iam_policy_document.eks_cluster_assume](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.eks_fargate_assume](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.eks_node_assume](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 | [tls_certificate.self](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/data-sources/certificate) | data source |
@@ -54,8 +53,8 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_eks_addons"></a> [eks\_addons](#input\_eks\_addons) | List of EKS AddOns to deploy. | `map(any)` | <pre>{<br>  "coredns": {},<br>  "kube-proxy": {},<br>  "vpc-cni": {}<br>}</pre> | no |
-| <a name="input_eks_farget_profiles"></a> [eks\_farget\_profiles](#input\_eks\_farget\_profiles) | List of Farget profiles to deploy. | `map(any)` | <pre>{<br>  "default": {<br>    "namespace": "*"<br>  }<br>}</pre> | no |
+| <a name="input_eks_addons"></a> [eks\_addons](#input\_eks\_addons) | List of EKS AddOns to deploy. | `map(any)` | <pre>{<br/>  "coredns": {},<br/>  "eks-pod-identity-agent": {},<br/>  "kube-proxy": {},<br/>  "vpc-cni": {}<br/>}</pre> | no |
+| <a name="input_eks_farget_profiles"></a> [eks\_farget\_profiles](#input\_eks\_farget\_profiles) | List of Farget profiles to deploy. | <pre>map(list(<br/>    object({<br/>      namespace = string<br/>      labels    = optional(map(string), {})<br/>    })<br/>  ))</pre> | `{}` | no |
 | <a name="input_eks_node_groups"></a> [eks\_node\_groups](#input\_eks\_node\_groups) | List of AWS managed node groups to deploy. | `map(any)` | `{}` | no |
 | <a name="input_eks_version"></a> [eks\_version](#input\_eks\_version) | Desired Kubernetes master version. | `string` | `""` | no |
 | <a name="input_name"></a> [name](#input\_name) | EKS cluster name. | `string` | `"default"` | no |
@@ -63,5 +62,9 @@ No modules.
 
 ## Outputs
 
-No outputs.
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+| Name | Description |
+|------|-------------|
+| <a name="output_aws_eks_cluster"></a> [aws\_eks\_cluster](#output\_aws\_eks\_cluster) | EKS cluster attributes. |
+| <a name="output_aws_iam_openid_connect_provider"></a> [aws\_iam\_openid\_connect\_provider](#output\_aws\_iam\_openid\_connect\_provider) | Open ID Connect provider attributes |
+| <a name="output_aws_iam_roles"></a> [aws\_iam\_roles](#output\_aws\_iam\_roles) | Roles attributes. |
+<!-- END_TF_DOCS -->

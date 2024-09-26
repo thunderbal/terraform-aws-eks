@@ -17,6 +17,7 @@ locals {
   }
 
   eks_farget_profiles = var.eks_farget_profiles
+
   eks_node_groups = {
     for k, v in var.eks_node_groups : k => {
       ami_type      = try(v.ami_type, "AL2023_x86_64_STANDARD")
